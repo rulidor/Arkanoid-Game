@@ -60,9 +60,6 @@
     <ClInclude Include="Vec2.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="RectF.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
     <ClInclude Include="Brick.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -73,6 +70,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FrameTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Paddle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RectF.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -120,6 +123,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FrameTimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Paddle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
