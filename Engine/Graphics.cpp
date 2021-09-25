@@ -307,6 +307,34 @@ void Graphics::BeginFrame()
 	memset( pSysBuffer,0u,sizeof( Color ) * Graphics::ScreenHeight * Graphics::ScreenWidth );
 }
 
+void Graphics::DrawRect(int x0, int y0, int x1, int y1, Color c)
+{
+	int initial_y0 = y0;
+	for (; x0 < x1; x0++) {
+		y0 = initial_y0;
+		for (; y0 < y1; y0++) {
+			PutPixel(x0, y0, c);
+		}
+	}
+}
+
+void Graphics::DrawCircle(int x, int y, int radius, Color c)
+{
+	const int rad_sq = radius * radius;
+	for (int y_loop = y - radius + 1; y_loop < y + radius; y_loop++)
+	{
+		for (int x_loop = x - radius + 1; x_loop < x + radius; x_loop++)
+		{
+			const int x_diff = x - x_loop;
+			const int y_diff = y - y_loop;
+			if (x_diff * x_diff + y_diff * y_diff <= rad_sq)
+			{
+				PutPixel(x_loop, y_loop, c);
+			}
+		}
+	}
+}
+
 void Graphics::PutPixel( int x,int y,Color c )
 {
 	assert( x >= 0 );
