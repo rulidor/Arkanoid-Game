@@ -1,4 +1,5 @@
 #include "Paddle.h"
+#include <cmath>
 
 Paddle::Paddle(const Vec2& pos_in, float halfWidth_in, float halfHeight_in)
 	:
@@ -17,10 +18,36 @@ void Paddle::Draw(Graphics& gfx) const
 	gfx.DrawRect(rect, color);
 }
 
-bool Paddle::IsBallCollision(Ball& ball) const
+bool Paddle::IsBallCollision(Ball& ball)
 {
-	if (ball.GetVelocity().y > 0.0f && GetRect().IsOverlappingWith(ball.GetRect())) {
-		ball.ReboundY();
+	if (isCooldown) {
+		return false;
+	}
+	const RectF rect = GetRect();
+	if (rect.IsOverlappingWith(ball.GetRect())) {
+		const Vec2 ballPos = ball.GetPosition();
+		if (std::signbit(ball.GetVelocity().x) == std::signbit((ballPos - pos).x) 
+			|| (ballPos.x >= rect.left && ballPos.x <= rect.right) ) {
+			Vec2 dir;
+			const float xDifference = ballPos.x - pos.x;
+			const float fixedXComponent = fixedZoneHalfWidth * exitXFactor;
+			if (std::abs(xDifference) < fixedZoneHalfWidth) {
+				if (xDifference < 0.0f) {
+					dir = Vec2(-fixedXComponent, -1.0f);
+				}
+				else {
+					dir = Vec2(fixedXComponent, -1.0f);
+				}
+			}
+			else {
+				dir = Vec2(xDifference * exitXFactor, -1.0f);
+			}
+			ball.SetDirection(dir);
+		}
+		else {
+			ball.ReboundX();
+		}
+		isCooldown = true;
 		return true;
 	}
 	return false;
@@ -50,4 +77,9 @@ void Paddle::Update(const Keyboard& kbd, float dt)
 RectF Paddle::GetRect() const
 {
 	return RectF::FromCenter(pos, halfWidth, halfHeight);
+}
+
+void Paddle::ResetCooldown()
+{
+	isCooldown = false;
 }

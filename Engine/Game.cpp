@@ -21,12 +21,13 @@
 #include "MainWindow.h"
 #include "Game.h"
 #include "Brick.h"
+#include "SpriteCodex.h"
 
 Game::Game(MainWindow& wnd)
 	:
 	wnd(wnd),
 	gfx(wnd),
-	ball(Vec2(300.0f, 300.0f), Vec2(300.0f, 300.0f)),
+	ball(Vec2(300.0f, 300.0f), Vec2(-1.0f, -1.0f)),
 	walls(0.0f, float(gfx.ScreenWidth), 0.0f, float(gfx.ScreenHeight)),
 	soundPad(L"Sounds\\arkpad.wav"),
 	soundBrick(L"sounds\\arkbrick.wav"),
@@ -49,39 +50,81 @@ Game::Game(MainWindow& wnd)
 void Game::Go()
 {
 	gfx.BeginFrame();	
-	UpdateModel();
+	float elapsedTime = ft.Mark(); //the time passed between frames
+	while (elapsedTime > 0.0f) {
+		const float dt = std::min(0.0025f, elapsedTime); //2.5 milliseconds
+		UpdateModel(dt);
+		elapsedTime -= dt;
+	}
 	ComposeFrame();
 	gfx.EndFrame();
 }
 
-void Game::UpdateModel()
+void Game::UpdateModel(float dt)
 {
-	const float dt = ft.Mark();
+	if (gameIsOver) {
+		return;
+	}
 	pad.Update(wnd.kbd, dt);
 	pad.IsWallCollision(walls);
 
 	ball.Update(dt);
-	for (Brick& b : bricks) {
-		if (b.IsBallCollision(ball))
+	
+	bool collisionHappened = false;
+	float currColDistSq;
+	int currCollisionIndex; //index for the brick of the current collision
+	for (int i = 0; i < nBricks; i++) {
+		if (bricks[i].CheckBallCollision(ball))
 		{
-			soundBrick.Play();
-			break;
+			const float newColDistSq = (ball.GetPosition() - bricks[i].GetCenter()).GetLengthSq();
+			if (collisionHappened) //if it's not the first collision happened
+			{
+				if (newColDistSq < currColDistSq) {
+					currColDistSq = newColDistSq;
+					currCollisionIndex = i;
+					
+				}
+			}
+			else
+			{
+				currColDistSq = newColDistSq;
+				currCollisionIndex = i;
+				collisionHappened = true;
+			}
 		}
+	}
+	if (collisionHappened) {
+		pad.ResetCooldown();
+		bricks[currCollisionIndex].ExecuteBallCollision(ball);
+		soundBrick.Play();
 	}
 
 	if (pad.IsBallCollision(ball)) {
 		soundPad.Play();
 	}
-	if (ball.IsWallCollision(walls)) {
+	const int ballWallCollResult = ball.IsWallCollision(walls);
+	if (ballWallCollResult == 1) {
+		pad.ResetCooldown();
 		soundPad.Play();
+	}
+	else if (ballWallCollResult == 2) {
+		gameIsOver = true;
 	}
 }
 
 void Game::ComposeFrame()
 {
-	ball.Draw(gfx);
+	if (!gameIsOver) {
+		ball.Draw(gfx);
+
+	}
+	else {
+		SpriteCodex::DrawGameOver(Vec2(400.0f, 300.0f), gfx);
+	}
 	for (const Brick& b : bricks) {
 		b.Draw(gfx);
+		pad.Draw(gfx);
+
 	}
-	pad.Draw(gfx);
+
 }

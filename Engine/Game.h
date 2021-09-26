@@ -38,7 +38,7 @@ public:
 	void Go();
 private:
 	void ComposeFrame();
-	void UpdateModel();
+	void UpdateModel(float dt);
 	/********************************/
 	/*  User Functions              */
 	/********************************/
@@ -57,6 +57,7 @@ private:
 	Brick bricks[nBricks];
 	Paddle pad;
 	RectF walls;
+	bool gameIsOver = false;
 	Sound soundPad;
 	Sound soundBrick;
 	/********************************/
