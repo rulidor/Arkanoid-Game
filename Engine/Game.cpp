@@ -29,8 +29,8 @@ Game::Game(MainWindow& wnd)
 	gfx(wnd),
 	ball(Vec2(300.0f, 300.0f), Vec2(-1.0f, -1.0f)),
 	walls(0.0f, float(gfx.ScreenWidth), 0.0f, float(gfx.ScreenHeight)),
-	soundPad(L"Sounds\\arkpad.wav"),
-	soundBrick(L"sounds\\arkbrick.wav"),
+	//soundPad(L"Sounds\\arkpad.wav"),
+	//soundBrick(L"sounds\\arkbrick.wav"),	
 	pad(Vec2(400.0f, 500.0f), 50.0f, 10.0f)
 {
 	const Color colors[4] = { Colors::Red, Colors::Green, Colors::Blue, Colors::Cyan };
@@ -96,16 +96,16 @@ void Game::UpdateModel(float dt)
 	if (collisionHappened) {
 		pad.ResetCooldown();
 		bricks[currCollisionIndex].ExecuteBallCollision(ball);
-		soundBrick.Play();
+		//soundBrick.Play();
 	}
 
 	if (pad.IsBallCollision(ball)) {
-		soundPad.Play();
+		//soundPad.Play();
 	}
 	const int ballWallCollResult = ball.IsWallCollision(walls);
 	if (ballWallCollResult == 1) {
 		pad.ResetCooldown();
-		soundPad.Play();
+		//soundPad.Play();
 	}
 	else if (ballWallCollResult == 2) {
 		gameIsOver = true;
